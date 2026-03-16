@@ -9,6 +9,8 @@ Started: Mon Mar 16 12:12:17 UTC 2026
 - apps/web uses Next.js App Router with bundler module resolution (different from packages)
 - @ingot/core is referenced as `"@ingot/core": "*"` in dependent package.json files
 - Run `npm run typecheck` from root to check all workspaces
+- apps/web global styles use CSS vars (--bg, --border, --text, --text-muted, --text-dim) defined in globals.css; use inline `style=` for these vars in components rather than Tailwind classes since Tailwind doesn't know the CSS vars
+- apps/web uses JetBrains_Mono from `next/font/google`, exposed as `--font-mono` CSS variable and applied to html element
 ---
 
 ## 2026-03-16 - US-001
@@ -127,4 +129,17 @@ Started: Mon Mar 16 12:12:17 UTC 2026
   - ESM packages (NodeNext resolution) require `.js` extensions in imports even for `.ts` source files
   - Zod's .parse() throws ZodError with descriptive messages automatically — no custom error wrapping needed
   - Export `type` separately from value exports to keep type-only re-exports explicit
+---
+
+## 2026-03-16 - US-010
+- Updated globals.css: dark mode CSS vars (--bg, --bg-subtle, --border, --text, --text-muted, --text-dim), monospace body font, no gradients, structural TanStack aesthetic
+- Updated layout.tsx: JetBrains_Mono from next/font/google, dark html with --font-mono variable
+- Updated page.tsx (/ route): header with nav, 2-column layout (form area left, preview panel right with placeholders for US-011/012)
+- Created apps/web/src/app/docs/page.tsx: header, sidebar nav, docs content with all 6 sections (what is ingot, quick start, CLI ref, schema, supported pieces table, FAQ)
+- Files changed: apps/web/src/app/globals.css, apps/web/src/app/layout.tsx, apps/web/src/app/page.tsx, apps/web/src/app/docs/page.tsx
+- **Learnings for future iterations:**
+  - Use inline `style=` props for CSS custom vars (--bg etc.) since Tailwind cannot resolve them
+  - `next/font/google` with `JetBrains_Mono` works fine in Next.js 14; import name uses underscores for spaces
+  - docs/page.tsx is a Server Component — no "use client" needed for static content
+  - Browser verification was not done (no dev-browser tool configured); manual browser check needed
 ---
