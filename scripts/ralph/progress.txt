@@ -48,6 +48,19 @@ Started: Mon Mar 16 12:12:17 UTC 2026
   - The `--yes` flag on create-next-app suppresses all interactive prompts
 ---
 
+## 2026-03-16 - US-005
+- Added getDbOrmStep() to packages/core/src/orchestrator.ts
+- Drizzle step: installs drizzle-orm + drizzle-kit, runs drizzle-kit generate with correct --dialect flag (postgresql/mysql/sqlite)
+- Prisma step: installs prisma + @prisma/client, runs prisma init with --datasource-provider flag
+- Both steps include DATABASE_URL in envVars
+- getSteps() now returns [frameworkStep, dbOrmStep]
+- Files changed: packages/core/src/orchestrator.ts
+- **Learnings for future iterations:**
+  - Drizzle uses dialect names "postgresql"/"mysql"/"sqlite" (not "postgres") for its CLI flags
+  - getSteps() accumulates steps in order — US-006 auth step should be appended after dbOrmStep
+  - Prisma init creates schema.prisma automatically; drizzle-kit generate needs a config file in practice but the command is correct for scaffolding
+---
+
 ## 2026-03-16 - US-002
 - Created packages/core/src/schema.ts with full Zod schema for IngotConfig
 - Exported IngotConfig type and validateConfig() from packages/core/src/index.ts
