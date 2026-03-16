@@ -76,6 +76,32 @@ Started: Mon Mar 16 12:12:17 UTC 2026
   - Clerk package varies by framework (@clerk/nextjs vs @clerk/remix); tanstack-start uses @clerk/tanstack-start pattern
 ---
 
+## 2026-03-16 - US-007
+- Added getShadcnStep() to orchestrator.ts: runs `npx shadcn@latest init --theme <theme> --yes`
+- Added getEnvExampleStep() to orchestrator.ts: async function that aggregates all envVars from preceding steps and writes .env.example with commented key=value pairs
+- getSteps() now returns [frameworkStep, dbOrmStep, authStep?, shadcnStep, envExampleStep]
+- Files changed: packages/core/src/orchestrator.ts
+- **Learnings for future iterations:**
+  - .env.example step uses a dynamic import of `node:fs` inside the async command function to stay compatible with ESM
+  - getEnvExampleStep receives the already-built steps array (before itself) to collect envVars — must be called after all other steps are pushed
+  - Shadcn step passes theme via `--theme <theme>` flag with `--yes` to suppress prompts
+---
+
+## 2026-03-16 - US-008
+- Implemented interactive CLI in packages/cli/src/index.ts using @clack/prompts
+- Prompts cover all fields: project name → framework → DB provider → ORM → auth → UI theme → deployment
+- Validates assembled config with validateConfig() before execution
+- Each step runs with a Clack spinner; on failure prints step label + command + exits with code 1
+- On success, prints next-steps outro with cd/cp/.env instructions
+- Built @ingot/core first (dist/) so CLI package can resolve types
+- Files changed: packages/cli/src/index.ts, packages/cli/package.json, package-lock.json
+- **Learnings for future iterations:**
+  - @ingot/core exports from dist/; must `npm run build --workspace=packages/core` before typechecking CLI
+  - @clack/prompts select() generic: `select<T>({ options: Array<{value: T}> })` — pass the enum type for type safety
+  - text() validate callback receives `string | undefined` — use `(v ?? '')` to avoid TS18048
+  - isCancel(result) pattern with process.exit(0) is the standard Clack cancellation guard
+---
+
 ## 2026-03-16 - US-002
 - Created packages/core/src/schema.ts with full Zod schema for IngotConfig
 - Exported IngotConfig type and validateConfig() from packages/core/src/index.ts
