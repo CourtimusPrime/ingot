@@ -36,6 +36,18 @@ Started: Mon Mar 16 12:12:17 UTC 2026
   - ESM `.js` extension required in imports (as per existing pattern)
 ---
 
+## 2026-03-16 - US-004
+- Created packages/core/src/orchestrator.ts with OrchestratorStep type and getSteps()
+- OrchestratorStep has: label (string), command (string | function), envVars (string[]), postRun? (function)
+- getSteps() returns framework step first; nextjs uses --yes flag to suppress prompts; tanstack-start uses gitpkg; remix uses --yes flag
+- Exported getSteps and OrchestratorStep from packages/core/src/index.ts
+- Files changed: packages/core/src/orchestrator.ts, packages/core/src/index.ts
+- **Learnings for future iterations:**
+  - getSteps() is designed to accumulate steps — future stories (US-005, 006, 007) should add to the returned array after the framework step
+  - OrchestratorStep.command accepts string or async function for flexibility when a step can't be expressed as a shell command
+  - The `--yes` flag on create-next-app suppresses all interactive prompts
+---
+
 ## 2026-03-16 - US-002
 - Created packages/core/src/schema.ts with full Zod schema for IngotConfig
 - Exported IngotConfig type and validateConfig() from packages/core/src/index.ts
