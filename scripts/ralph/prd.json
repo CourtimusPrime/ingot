@@ -1,0 +1,227 @@
+{
+  "project": "Ingot",
+  "branchName": "ralph/ingot-v1",
+  "description": "Ingot v1 — The Builder: full-stack app scaffolder with interactive CLI and web configurator at ingot.ink",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Set up monorepo",
+      "description": "As a developer, I need the monorepo scaffolded so work can begin on packages independently.",
+      "acceptanceCriteria": [
+        "Root package.json with workspaces configured for packages/cli, packages/core, and apps/web",
+        "packages/cli is an empty TypeScript package with a bin entry pointing to src/index.ts",
+        "packages/core is an empty TypeScript package",
+        "apps/web is a Next.js app (App Router, TypeScript, Tailwind)",
+        "Shared tsconfig.json base at root; each package/app extends it",
+        "packages/core is importable from packages/cli and apps/web via workspace reference",
+        "Build succeeds from the root",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Define the ingot.json Zod schema",
+      "description": "As a developer, I need a validated schema for ingot.json so that all parts of the system share a single source of truth for valid build configs.",
+      "acceptanceCriteria": [
+        "Zod schema defined in packages/core/src/schema.ts covering all v1 fields: name, framework, database.provider, database.orm, auth, ui.library, ui.theme, deployment",
+        "framework enum: 'nextjs' | 'tanstack-start' | 'remix'",
+        "database.provider enum: 'postgres' | 'mysql' | 'sqlite'",
+        "database.orm enum: 'drizzle' | 'prisma'",
+        "auth enum: 'clerk' | 'better-auth' | 'nextauth' | 'none'",
+        "ui.library enum: 'shadcn'",
+        "ui.theme enum: all 11 Shadcn themes (zinc, slate, stone, gray, neutral, red, rose, orange, blue, yellow, violet)",
+        "deployment enum: 'vercel' | 'cloudflare' | 'railway'",
+        "IngotConfig TypeScript type exported from packages/core",
+        "validateConfig(json: unknown): IngotConfig utility exported from packages/core",
+        "Invalid configs throw a descriptive Zod error",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Implement package manager detection",
+      "description": "As the CLI, I need to detect which package manager the user has available so all install commands use it consistently.",
+      "acceptanceCriteria": [
+        "packages/core/src/packageManager.ts exports detectPackageManager(): 'bun' | 'pnpm' | 'npm'",
+        "Detection checks for lockfiles first: bun.lockb → bun, pnpm-lock.yaml → pnpm, package-lock.json → npm",
+        "Falls back to checking which binaries are available in PATH",
+        "Falls back to npm if nothing is detected",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Implement orchestration types and framework steps",
+      "description": "As the CLI, I need the core orchestration types defined and framework scaffolding steps implemented so the system has a foundation to build other steps on.",
+      "acceptanceCriteria": [
+        "packages/core/src/orchestrator.ts defines OrchestratorStep type with: label (string), command (string or function), envVars (string[]), optional postRun (function)",
+        "getSteps(config: IngotConfig): OrchestratorStep[] exported from packages/core/src/orchestrator.ts",
+        "Framework step for nextjs runs: npx create-next-app@latest <name> --typescript --tailwind --eslint --app --no-git with all prompts suppressed",
+        "Framework step for tanstack-start runs the appropriate non-interactive init command",
+        "Framework step for remix runs the appropriate non-interactive init command",
+        "Framework step is always first in the returned steps array",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Implement database/ORM orchestration steps",
+      "description": "As the CLI, I need orchestration steps for all database provider and ORM combinations so those can be scaffolded after the framework.",
+      "acceptanceCriteria": [
+        "Step defined for each ORM (drizzle, prisma) that installs the correct packages via the detected package manager",
+        "Drizzle step runs drizzle-kit init with the correct dialect flag for the selected DB provider",
+        "Prisma step runs prisma init with the correct datasource provider flag",
+        "Each DB/ORM step includes the correct envVars entries (e.g., DATABASE_URL)",
+        "DB/ORM step runs after the framework step in getSteps output",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Implement auth orchestration steps",
+      "description": "As the CLI, I need orchestration steps for all supported auth providers so auth is wired into the scaffolded project.",
+      "acceptanceCriteria": [
+        "Step defined for clerk: installs @clerk/nextjs (or framework equivalent), writes middleware stub, adds NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY to envVars",
+        "Step defined for better-auth: installs better-auth, writes auth config stub, adds required envVars",
+        "Step defined for nextauth: installs next-auth, writes [...nextauth] route stub, adds NEXTAUTH_SECRET and NEXTAUTH_URL to envVars",
+        "auth: 'none' produces no step (skipped entirely)",
+        "Each auth step includes a docUrl string pointing to the provider's official setup docs",
+        "Auth step runs after the DB/ORM step in getSteps output",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Implement UI and .env.example orchestration steps",
+      "description": "As the CLI, I need the Shadcn UI step and the final .env.example write step so the scaffold is fully complete.",
+      "acceptanceCriteria": [
+        "Shadcn step runs: npx shadcn@latest init with the configured theme and --yes flag to suppress prompts",
+        "Shadcn step runs after the auth step in getSteps output",
+        ".env.example step is always last in getSteps output",
+        ".env.example step aggregates all envVars from all preceding steps and writes a .env.example file with each key on its own line with a one-line comment",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Build the interactive CLI",
+      "description": "As a solo developer, I want to run npx ingot init and be guided through prompts to configure and scaffold my project.",
+      "acceptanceCriteria": [
+        "npx ingot init launches a Clack-powered interactive prompt sequence",
+        "Prompts cover all fields in order: project name → framework → database provider → ORM → auth → UI theme → deployment target",
+        "Selected values are assembled into a valid IngotConfig and validated before execution begins",
+        "On confirmation, each orchestration step runs with a Clack spinner showing the step label",
+        "On success, prints a summary with project name, directory, and next steps",
+        "On failure, prints which step failed, the command that failed, and exits with code 1",
+        "Typecheck passes"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "title": "Build the non-interactive CLI mode",
+      "description": "As an AI agent or power user, I want to run npx ingot init with a config file or inline flags to scaffold without prompts.",
+      "acceptanceCriteria": [
+        "npx ingot init --config ingot.json reads and validates the config file then executes without prompts",
+        "npx ingot init my-app --framework nextjs --db postgres/drizzle --auth clerk --ui shadcn/zinc --deployment vercel works as a fully non-interactive one-liner",
+        "Invalid flag values produce a clear error message before any scaffolding begins",
+        "npx ingot init my-app pre-fills the project name and prompts for the remaining fields interactively",
+        "Execution after config resolution is identical to the interactive path",
+        "Typecheck passes"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-010",
+      "title": "Build the web configurator shell and layout",
+      "description": "As a developer, I need the ingot.ink app shell so the configurator and docs have a consistent layout to build within.",
+      "acceptanceCriteria": [
+        "apps/web has a root layout with dark mode default, clean typography (GeistMono or similar monospace font)",
+        "Global styles match TanStack aesthetic: no gradients, no playful illustrations, typographic and structural",
+        "/ route renders a configurator page shell (header, main content area, sidebar or preview panel placeholder)",
+        "/docs route renders a docs page shell with sidebar nav placeholder",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-011",
+      "title": "Build the web configurator step-by-step form",
+      "description": "As a developer, I want to select my stack visually at ingot.ink through a step-by-step form so I can configure without memorising flags.",
+      "acceptanceCriteria": [
+        "Multi-step form covers all config fields in order: project name → framework → DB provider → ORM → auth → UI theme → deployment",
+        "Each step displays available options as selectable cards or buttons",
+        "Selected option is visually highlighted",
+        "A Next button advances to the next step; all required fields must be filled to advance",
+        "Step indicator shows current position in the sequence",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 11,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-012",
+      "title": "Build the web configurator output panel",
+      "description": "As a developer, I want to see the generated ingot.json and CLI command update live as I make selections so I can copy and run immediately.",
+      "acceptanceCriteria": [
+        "Live preview panel shows syntax-highlighted ingot.json updating as selections change",
+        "Generated CLI command string updates in real time below the JSON preview",
+        "Copy command button copies the CLI command to clipboard and shows a brief confirmation",
+        "Download ingot.json button downloads the config as a file",
+        "Panel is visible alongside the form (not hidden behind a tab)",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 12,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-013",
+      "title": "Build the documentation site",
+      "description": "As a developer evaluating Ingot, I want clear documentation at ingot.ink/docs so I understand what Ingot does and how to use it.",
+      "acceptanceCriteria": [
+        "/docs route exists and renders a documentation layout with sidebar navigation",
+        "Docs cover: what Ingot is, quick start (CLI), full CLI reference, ingot.json schema reference, supported pieces table, FAQ",
+        "Quick start includes a copy-pasteable npx ingot init command",
+        "Supported pieces table lists all v1 enum values for each field",
+        "Pages are statically rendered (no client-side data fetching required)",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 13,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

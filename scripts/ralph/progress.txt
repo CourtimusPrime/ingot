@@ -1,0 +1,25 @@
+# Ralph Progress Log
+Started: Mon Mar 16 12:12:17 UTC 2026
+---
+
+## Codebase Patterns
+- Monorepo uses npm workspaces with packages/* and apps/* layout
+- Root tsconfig.json is the base; each package extends it with its own rootDir/outDir
+- packages/core uses ESM (`"type": "module"`) with NodeNext module resolution
+- apps/web uses Next.js App Router with bundler module resolution (different from packages)
+- @ingot/core is referenced as `"@ingot/core": "*"` in dependent package.json files
+- Run `npm run typecheck` from root to check all workspaces
+---
+
+## 2026-03-16 - US-001
+- Created monorepo structure with npm workspaces
+- packages/cli: empty TypeScript package with bin entry
+- packages/core: empty TypeScript package (ESM)
+- apps/web: Next.js App Router + TypeScript + Tailwind (manually scaffolded)
+- Root tsconfig.json base; each workspace extends it
+- Files changed: package.json, tsconfig.json, packages/cli/*, packages/core/*, apps/web/*
+- **Learnings for future iterations:**
+  - apps/web tsconfig does NOT extend root tsconfig — Next.js needs its own compiler options (bundler moduleResolution, noEmit, jsx:preserve)
+  - Build works with `npm run build --workspaces --if-present`
+  - apps/web build requires `next build` which requires full Next.js setup; typecheck via `tsc --noEmit` is sufficient for CI
+---
