@@ -61,6 +61,21 @@ Started: Mon Mar 16 12:12:17 UTC 2026
   - Prisma init creates schema.prisma automatically; drizzle-kit generate needs a config file in practice but the command is correct for scaffolding
 ---
 
+## 2026-03-16 - US-006
+- Added getAuthStep() to packages/core/src/orchestrator.ts
+- Clerk step: installs @clerk/nextjs (or @clerk/remix for remix), adds NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY + CLERK_SECRET_KEY envVars
+- Better Auth step: installs better-auth, adds BETTER_AUTH_SECRET + BETTER_AUTH_URL envVars
+- NextAuth step: installs next-auth, adds NEXTAUTH_SECRET + NEXTAUTH_URL envVars
+- auth: 'none' returns null and is skipped in getSteps()
+- Added docUrl field to OrchestratorStep type (optional)
+- getSteps() now returns [frameworkStep, dbOrmStep, authStep?]
+- Files changed: packages/core/src/orchestrator.ts
+- **Learnings for future iterations:**
+  - OrchestratorStep.docUrl is an optional field — only auth steps use it currently
+  - getAuthStep returns null for 'none' — use null-check pattern before pushing to steps array
+  - Clerk package varies by framework (@clerk/nextjs vs @clerk/remix); tanstack-start uses @clerk/tanstack-start pattern
+---
+
 ## 2026-03-16 - US-002
 - Created packages/core/src/schema.ts with full Zod schema for IngotConfig
 - Exported IngotConfig type and validateConfig() from packages/core/src/index.ts
