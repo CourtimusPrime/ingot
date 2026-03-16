@@ -5,6 +5,7 @@ export type OrchestratorStep = {
   command: string | (() => Promise<void>);
   envVars: string[];
   postRun?: () => Promise<void>;
+  docUrl?: string;
 };
 
 function getFrameworkStep(config: IngotConfig): OrchestratorStep {
@@ -59,9 +60,51 @@ function getDbOrmStep(config: IngotConfig): OrchestratorStep {
   };
 }
 
+function getAuthStep(config: IngotConfig): OrchestratorStep | null {
+  const { auth, framework } = config;
+
+  if (auth === 'none') {
+    return null;
+  }
+
+  if (auth === 'clerk') {
+    const pkg = framework === 'nextjs' ? '@clerk/nextjs' : '@clerk/remix';
+    return {
+      label: 'Install Clerk auth',
+      command: `npm install ${pkg}`,
+      envVars: ['NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY', 'CLERK_SECRET_KEY'],
+      docUrl: 'https://clerk.com/docs/quickstarts/nextjs',
+    };
+  }
+
+  if (auth === 'better-auth') {
+    return {
+      label: 'Install Better Auth',
+      command: 'npm install better-auth',
+      envVars: ['BETTER_AUTH_SECRET', 'BETTER_AUTH_URL'],
+      docUrl: 'https://www.better-auth.com/docs/installation',
+    };
+  }
+
+  // nextauth
+  return {
+    label: 'Install NextAuth.js',
+    command: 'npm install next-auth',
+    envVars: ['NEXTAUTH_SECRET', 'NEXTAUTH_URL'],
+    docUrl: 'https://authjs.dev/getting-started',
+  };
+}
+
 export function getSteps(config: IngotConfig): OrchestratorStep[] {
-  return [
+  const steps: OrchestratorStep[] = [
     getFrameworkStep(config),
     getDbOrmStep(config),
   ];
+
+  const authStep = getAuthStep(config);
+  if (authStep) {
+    steps.push(authStep);
+  }
+
+  return steps;
 }
