@@ -131,6 +131,24 @@ Started: Mon Mar 16 12:12:17 UTC 2026
   - Export `type` separately from value exports to keep type-only re-exports explicit
 ---
 
+## 2026-03-16 - US-011
+- Created apps/web/src/components/ConfiguratorForm.tsx as a "use client" component
+- Multi-step form with 7 steps: project name (text input) → framework → DB provider → ORM → auth → UI theme → deployment
+- Each non-text step renders selectable cards with border highlight on selection
+- Step indicator: animated dot row (active dot expands to 24px wide) with "N / 7" counter
+- Dot buttons allow navigating back to previously completed steps
+- Next/Back buttons; final step shows "generate" button
+- Next is disabled and visually muted until a selection is made for the current step
+- UI theme step shows colored swatches (no description, smaller grid columns)
+- Exported FormConfig type and onConfigChange?: callback for US-012 to wire in live preview
+- Updated apps/web/src/app/page.tsx to import and render <ConfiguratorForm />
+- Files changed: apps/web/src/components/ConfiguratorForm.tsx, apps/web/src/app/page.tsx
+- **Learnings for future iterations:**
+  - ConfiguratorForm exposes `onConfigChange?: (config: FormConfig) => void` — US-012 should make page.tsx a client component, lift state, and pass this callback to wire the preview panel
+  - FormConfig and STEPS are defined in ConfiguratorForm.tsx — import from there for the preview panel
+  - Browser verification not done (no dev-browser tool); manual check needed
+---
+
 ## 2026-03-16 - US-010
 - Updated globals.css: dark mode CSS vars (--bg, --bg-subtle, --border, --text, --text-muted, --text-dim), monospace body font, no gradients, structural TanStack aesthetic
 - Updated layout.tsx: JetBrains_Mono from next/font/google, dark html with --font-mono variable
