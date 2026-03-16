@@ -24,6 +24,18 @@ Started: Mon Mar 16 12:12:17 UTC 2026
   - apps/web build requires `next build` which requires full Next.js setup; typecheck via `tsc --noEmit` is sufficient for CI
 ---
 
+## 2026-03-16 - US-003
+- Created packages/core/src/packageManager.ts with detectPackageManager() function
+- Lockfile detection: bun.lockb → bun, pnpm-lock.yaml → pnpm, package-lock.json → npm
+- PATH fallback using `which` via execSync, defaults to npm
+- Exported detectPackageManager and PackageManager type from packages/core/src/index.ts
+- Files changed: packages/core/src/packageManager.ts, packages/core/src/index.ts
+- **Learnings for future iterations:**
+  - `execSync` with `stdio: 'ignore'` is the cleanest way to check binary availability
+  - The `cwd` param defaults to `process.cwd()` for testability
+  - ESM `.js` extension required in imports (as per existing pattern)
+---
+
 ## 2026-03-16 - US-002
 - Created packages/core/src/schema.ts with full Zod schema for IngotConfig
 - Exported IngotConfig type and validateConfig() from packages/core/src/index.ts
