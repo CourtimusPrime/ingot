@@ -102,6 +102,22 @@ Started: Mon Mar 16 12:12:17 UTC 2026
   - isCancel(result) pattern with process.exit(0) is the standard Clack cancellation guard
 ---
 
+## 2026-03-16 - US-009
+- Refactored packages/cli/src/index.ts to support non-interactive modes
+- Added parseArgs() to parse --config, --framework, --db <provider>/<orm>, --auth, --ui <library>/<theme>, --deployment, and positional name
+- --config mode: reads JSON file, validates with validateConfig(), runs without prompts
+- Fully inline flags mode: if all fields provided via flags, validates and runs without prompts
+- Partial flags mode: pre-fills provided values, prompts only for missing fields
+- Invalid flags/config produce clear error message and exit(1) before any scaffolding
+- Extracted runScaffold(config) function — shared execution path for all modes
+- Files changed: packages/cli/src/index.ts
+- **Learnings for future iterations:**
+  - `--db postgres/drizzle` and `--ui shadcn/zinc` use slash-separated compound flags
+  - The `init` subcommand is stripped from argv before flag parsing
+  - Validation happens before any scaffold steps in all modes — use try/catch around validateConfig()
+  - runScaffold() is the single execution path — interactive, config file, and flags all converge there
+---
+
 ## 2026-03-16 - US-002
 - Created packages/core/src/schema.ts with full Zod schema for IngotConfig
 - Exported IngotConfig type and validateConfig() from packages/core/src/index.ts
