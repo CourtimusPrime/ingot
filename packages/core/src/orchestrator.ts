@@ -95,6 +95,29 @@ function getAuthStep(config: IngotConfig): OrchestratorStep | null {
   };
 }
 
+function getShadcnStep(config: IngotConfig): OrchestratorStep {
+  const { ui } = config;
+  return {
+    label: 'Initialize Shadcn UI',
+    command: `npx shadcn@latest init --theme ${ui.theme} --yes`,
+    envVars: [],
+  };
+}
+
+function getEnvExampleStep(steps: OrchestratorStep[]): OrchestratorStep {
+  const allEnvVars = steps.flatMap((s) => s.envVars);
+
+  return {
+    label: 'Write .env.example',
+    command: async () => {
+      const { writeFileSync } = await import('node:fs');
+      const lines = allEnvVars.map((key) => `# ${key}\n${key}=`);
+      writeFileSync('.env.example', lines.join('\n') + '\n', 'utf-8');
+    },
+    envVars: [],
+  };
+}
+
 export function getSteps(config: IngotConfig): OrchestratorStep[] {
   const steps: OrchestratorStep[] = [
     getFrameworkStep(config),
@@ -105,6 +128,9 @@ export function getSteps(config: IngotConfig): OrchestratorStep[] {
   if (authStep) {
     steps.push(authStep);
   }
+
+  steps.push(getShadcnStep(config));
+  steps.push(getEnvExampleStep(steps));
 
   return steps;
 }
