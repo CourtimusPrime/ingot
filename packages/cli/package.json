@@ -1,0 +1,19 @@
+{
+  "name": "@ingot/cli",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "ingot": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ingot/core": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
