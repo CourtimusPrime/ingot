@@ -34,6 +34,34 @@ function getFrameworkStep(config: IngotConfig): OrchestratorStep {
   };
 }
 
+function getDbOrmStep(config: IngotConfig): OrchestratorStep {
+  const { database } = config;
+  const { provider, orm } = database;
+
+  if (orm === 'drizzle') {
+    const dialectFlag =
+      provider === 'postgres' ? 'postgresql' :
+      provider === 'mysql' ? 'mysql' :
+      'sqlite';
+
+    return {
+      label: `Install Drizzle ORM (${provider})`,
+      command: `npm install drizzle-orm drizzle-kit && npx drizzle-kit generate --dialect ${dialectFlag}`,
+      envVars: ['DATABASE_URL'],
+    };
+  }
+
+  // prisma
+  return {
+    label: `Install Prisma (${provider})`,
+    command: `npm install prisma @prisma/client && npx prisma init --datasource-provider ${provider}`,
+    envVars: ['DATABASE_URL'],
+  };
+}
+
 export function getSteps(config: IngotConfig): OrchestratorStep[] {
-  return [getFrameworkStep(config)];
+  return [
+    getFrameworkStep(config),
+    getDbOrmStep(config),
+  ];
 }
