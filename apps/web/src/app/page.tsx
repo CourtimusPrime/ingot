@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ConfiguratorForm } from "@/components/ConfiguratorForm";
 
 export default function ConfiguratorPage() {
   return (
@@ -61,16 +62,7 @@ export default function ConfiguratorPage() {
               Select your options below to generate an ingot.json and CLI command.
             </p>
 
-            {/* Step placeholder */}
-            <div
-              style={{ border: "1px solid var(--border)", backgroundColor: "var(--bg-subtle)" }}
-              className="p-6"
-            >
-              <p style={{ color: "var(--text-dim)" }} className="text-xs">
-                {/* Form steps will be implemented in US-011 */}
-                Form steps coming soon.
-              </p>
-            </div>
+            <ConfiguratorForm />
           </div>
         </main>
 
