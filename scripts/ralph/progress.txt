@@ -23,3 +23,14 @@ Started: Mon Mar 16 12:12:17 UTC 2026
   - Build works with `npm run build --workspaces --if-present`
   - apps/web build requires `next build` which requires full Next.js setup; typecheck via `tsc --noEmit` is sufficient for CI
 ---
+
+## 2026-03-16 - US-002
+- Created packages/core/src/schema.ts with full Zod schema for IngotConfig
+- Exported IngotConfig type and validateConfig() from packages/core/src/index.ts
+- Installed zod as a dependency in packages/core
+- Files changed: packages/core/src/schema.ts, packages/core/src/index.ts, packages/core/package.json, package-lock.json
+- **Learnings for future iterations:**
+  - ESM packages (NodeNext resolution) require `.js` extensions in imports even for `.ts` source files
+  - Zod's .parse() throws ZodError with descriptive messages automatically — no custom error wrapping needed
+  - Export `type` separately from value exports to keep type-only re-exports explicit
+---
