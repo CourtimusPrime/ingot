@@ -140,8 +140,31 @@ export default function DocsPage() {
             >
               ingot.json schema
             </h2>
+            <div
+              style={{ border: "1px solid var(--border)", backgroundColor: "var(--bg-subtle)" }}
+              className="p-4 mb-4 text-xs leading-relaxed"
+            >
+              <pre style={{ color: "var(--text)", margin: 0 }}>{`{
+  "name": "my-app",
+  "framework": "nextjs" | "tanstack-start" | "remix",
+  "database": {
+    "provider": "postgres" | "mysql" | "sqlite",
+    "orm": "drizzle" | "prisma"
+  },
+  "auth": "clerk" | "better-auth" | "nextauth" | "none",
+  "ui": {
+    "library": "shadcn",
+    "theme": "zinc" | "slate" | "stone" | "gray" | "neutral"
+           | "red" | "rose" | "orange" | "blue" | "yellow" | "violet"
+  },
+  "deployment": "vercel" | "cloudflare" | "railway"
+}`}</pre>
+            </div>
             <div style={{ color: "var(--text-muted)" }} className="text-xs leading-relaxed mb-6">
-              <p className="mb-2">Full schema reference coming soon. See supported pieces below.</p>
+              <p>
+                All fields are required. Pass the file via{" "}
+                <code style={{ color: "var(--text)" }}>npx ingot init --config ingot.json</code>.
+              </p>
             </div>
 
             <h2
